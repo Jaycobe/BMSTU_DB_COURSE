@@ -1,0 +1,188 @@
+\addchap{Приложение А}
+
+Данное приложение содержит сценарии создания и заполнения базы данных.
+
+\captionsetup{singlelinecheck=false, justification=raggedright}
+\begin{lstlisting}[language=sql, caption=Создание базы данных и ее сущностей, label=create]
+create table if not exists Roles
+(
+    id serial primary key,
+    description text
+);
+
+create table if not exists Request_Types
+(
+    id serial primary key
+);
+
+create table if not exists Statuses
+(
+  id serial primary key
+);
+
+create table if not exists Teams
+(
+    id serial primary key,
+    name text,
+    n_members int,
+    rating float,
+    cap_id int,
+    foreign key (cap_id) references Users(id)
+);
+
+create table if not exists Users
+(
+  id serial primary key,
+  name text,
+  login text,
+  password text,
+  role serial,
+  foreign key (role) references Roles(id),
+  unique (login)
+);
+
+create table if not exists T_P_List
+(
+    part_id serial,
+\end{lstlisting}
+
+\captionsetup{singlelinecheck=false, justification=raggedright}
+\begin{lstlisting}[language=sql, caption=Продолжение листинга 4.1, label=fill]
+    team_id serial,
+    foreign key (team_id) references Teams(id),
+    foreign key (part_id) references Users(id)
+);
+create table if not exists Hackathons
+(
+    id serial primary key,
+    name text,
+    address text,
+    date date,
+    theme text,
+    duration float,
+    id_first serial,
+    id_second serial,
+    id_third serial,
+    foreign key (id_first) references Users(id),
+    foreign key (id_second) references Users(id),
+    foreign key (id_third) references Users(id)
+);
+
+create table if not exists Requests
+(
+    id serial primary key,
+    type serial,
+    requester_id serial,
+    requester_type serial,
+    status serial,
+    name text,
+    adm_id serial,
+    comment text,
+    foreign key (type) references Request_Types(id),
+    foreign key (requester_id) references Roles(id),
+    foreign key (status) references Statuses(id),
+    foreign key (adm_id) references Users(id)
+);
+\end{lstlisting}
+
+\newpage
+
+\captionsetup{singlelinecheck=false, justification=raggedright}
+\begin{lstlisting}[language=sql, caption=Заполнение базы данных, label=fill]
+import psycopg2
+
+open_files = []
+
+def get_insert_user_query(args):
+    name = args[0]
+    login = args[1]
+    password = args[2]
+    role = args[3]
+
+    query = f"insert into Users values (default, '{name}', '{login}',
+    '{password}', {role})"
+
+    return query
+
+def get_insert_team_query(args):
+    name = args[0]
+    n_members = args[1]
+    cap_id = args[2]
+    rating = args[3]
+
+    query = f"insert into Teams values (default, '{name}',
+    '{n_members}', '{rating}', {cap_id})"
+
+    return query
+
+def get_insert_t_p_query(args):
+    part_id = args[0]
+    team_id = args[1]
+
+    query = f"insert into t_p_list values ('{team_id}', '{part_id}')"
+    return query
+
+def get_insert_t_h_query(args):
+    team_id = args[0]
+    hack_id = args[1]
+
+    query = f"insert into t_p_list values ('{team_id}', '{hack_id}')"
+
+    return query
+
+def get_insert_hackathon_query(args):
+    name = args[0]
+    address = args[1]
+    date = args[2]
+    theme = args[3]
+\end{lstlisting}
+
+\captionsetup{singlelinecheck=false, justification=raggedright}
+\begin{lstlisting}[language=sql, caption=Заполнение базы данных, label=fill]
+
+    duration = args[4]
+    org_id = args[5]
+    first_id, second_id, third_id = args[6], args[7], args[8]
+
+    query = f"insert into hackathons values (default, '{name}', 
+    '{address}', '{date}', '{theme}', '{duration}', 
+    '{org_id}', '{first_id}', '{second_id}','{third_id}')"
+
+    return query
+
+connection = psycopg2.connect(user='postgres',
+                              password='postgres',
+                              port=228,
+                              host='localhost')
+
+cur = connection.cursor()
+
+filenames = ['admins.csv', 'organizers.csv', 'captains.csv',
+'participants.csv', 'teams.csv', 't_p_list.csv',
+             'hackathons.csv', "h_t_list.csv"]
+files = []
+
+for f in filenames:
+    files.append(open('generated data/' + f))
+
+for i in range(0, len(files)):
+    for line in files[i]:
+        args = line.split(';')
+        if i < 4:
+            query = get_insert_user_query(args)
+        elif i == 4:
+            query = get_insert_team_query(args)
+        elif i == 5:
+            query = get_insert_t_p_query(args)
+        elif i == 6:
+            query = get_insert_hackathon_query(args)
+        elif i == 7:
+            query = get_insert_t_h_query(args)
+
+        cur.execute(query)
+        connection.commit()
+for file in files:
+    file.close()
+cur.close()
+connection.close()
+\end{lstlisting}
