@@ -1,0 +1,76 @@
+{
+	"info": {
+		"_postman_id": "4d3a6a07-4f25-40a9-8722-a2bdbb6d3734",
+		"name": "Team methods",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27806185"
+	},
+	"item": [
+		{
+			"name": "Get teams list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:5000/teams",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"teams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get team by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:5000/teams/2",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"teams",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get team members list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:5000/teams/2/participants",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"teams",
+						"2",
+						"participants"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
